@@ -1,0 +1,5 @@
+D:\Programs\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\ViewAllWars\bin\Win64_Shipping_Client\ViewAllWars.dll
+D:\Programs\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\ViewAllWars\bin\Win64_Shipping_Client\ViewAllWars.pdb
+c:\users\jourdan haines\documents\visual studio 2015\Projects\ViewAllWars\ViewAllWars\obj\Debug\ViewAllWars.dll
+c:\users\jourdan haines\documents\visual studio 2015\Projects\ViewAllWars\ViewAllWars\obj\Debug\ViewAllWars.pdb
+c:\users\jourdan haines\documents\visual studio 2015\Projects\ViewAllWars\ViewAllWars\obj\Debug\ViewAllWars.csprojResolveAssemblyReference.cache

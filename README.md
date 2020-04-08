@@ -1,2 +1,5 @@
-# bannerlord-mods
-Master repository for mods created by myself for Mount&amp;Blade II: Bannerlord.
+# Bannerlord Mods
+Here you will find all the source code for mods created by myself for Mount&Blade II: Bannerlord.
+
+## Mod list
+ - [View All Wars v1.0.0](https://www.nexusmods.com/mountandblade2bannerlord/mods/293)
