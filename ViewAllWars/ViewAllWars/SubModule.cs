@@ -40,6 +40,11 @@ namespace ViewAllWars
             }
         }
 
+        public override void OnGameEnd(Game game) {
+            base.OnGameEnd(game);
+            loaded = false;
+        }
+
         public override bool DoLoading(Game game) {
             loaded = true;
             return base.DoLoading(game);
