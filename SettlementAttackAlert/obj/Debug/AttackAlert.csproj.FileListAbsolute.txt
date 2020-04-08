@@ -1,0 +1,5 @@
+D:\Programs\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\AttackAlert\bin\Win64_Shipping_Client\AttackAlert.dll
+D:\Programs\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\AttackAlert\bin\Win64_Shipping_Client\AttackAlert.pdb
+c:\users\jourdan haines\documents\visual studio 2015\Projects\AttackAlert\AttackAlert\obj\Debug\AttackAlert.csprojResolveAssemblyReference.cache
+c:\users\jourdan haines\documents\visual studio 2015\Projects\AttackAlert\AttackAlert\obj\Debug\AttackAlert.dll
+c:\users\jourdan haines\documents\visual studio 2015\Projects\AttackAlert\AttackAlert\obj\Debug\AttackAlert.pdb
