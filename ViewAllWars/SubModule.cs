@@ -8,48 +8,40 @@ namespace ViewAllWars
 {
     public class SubModule : MBSubModuleBase {
 
-        private bool loaded = false;
-
         protected override void OnApplicationTick(float dt) {
             base.OnApplicationTick(dt);
-            if(loaded) {
-                if(Campaign.Current.GameMode == CampaignGameMode.Campaign) {
-                    if (Campaign.Current.GameStarted) {
-                        if (InputKey.Home.IsPressed()) {
-                            string message = "Warring Empires Across Calradia\n\n";
-                            int count = 0;
+            if(Campaign.Current != null) {
+                if (Campaign.Current.GameStarted) {
+                    if (InputKey.Home.IsPressed()) {
+                        string message = "Warring Empires Across Calradia\n\n";
+                        int count = 0;
 
-                            foreach (Kingdom kingdom in Kingdom.All) {
-                                if (kingdom != null) {
-                                    count++;
-                                    message += count + ". " + kingdom.Name + " versus ";
-                                    foreach (Kingdom kingdom2 in from w in Kingdom.All orderby w.Name.ToString() select w) {
-                                        if (kingdom2 != null && !kingdom.Name.Equals(kingdom2.Name)) {
-                                            if (kingdom.IsAtWarWith(kingdom2)) {
-                                                message += kingdom2.Name + " and ";
-                                            }
+                        foreach (Kingdom kingdom in Kingdom.All) {
+                            if (kingdom != null) {
+                                count++;
+                                message += count + ". " + kingdom.Name + " versus ";
+                                int warCount = 0;
+                                foreach (Kingdom kingdom2 in from w in Kingdom.All orderby w.Name.ToString() select w) {
+                                    if (kingdom2 != null && !kingdom.Name.Equals(kingdom2.Name)) {
+                                        if (kingdom.IsAtWarWith(kingdom2)) {
+                                            message += kingdom2.Name + " and ";
+                                            warCount++;
                                         }
                                     }
-                                    message = message.Substring(0, message.Length - 5);
-                                    message += "\n\n";
                                 }
+                                if (warCount > 0)
+                                    message = message.Substring(0, message.Length - 5);
+                                else
+                                    message = message.Substring(0, message.Length - 8) + " is at peace.";
+                                message += "\n\n";
                             }
-
-                            InformationManager.ShowInquiry(new InquiryData("View All Wars", message, true, false, "Ok", "", null, null, ""), false);
                         }
+
+                        InformationManager.ShowInquiry(new InquiryData("View All Wars", message, true, false, "Ok", "", null, null, ""), false);
                     }
                 }
             }
-        }
-
-        public override void OnGameEnd(Game game) {
-            base.OnGameEnd(game);
-            loaded = false;
-        }
-
-        public override bool DoLoading(Game game) {
-            loaded = true;
-            return base.DoLoading(game);
+            
         }
     }
 }
