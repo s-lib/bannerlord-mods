@@ -1,0 +1,5 @@
+D:\Programs\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\SoundTheAlarm\bin\Win64_Shipping_Client\SoundTheAlarm.dll
+D:\Programs\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules\SoundTheAlarm\bin\Win64_Shipping_Client\SoundTheAlarm.pdb
+C:\Users\Jourdan Haines\Documents\Visual Studio 2015\Projects\AttackAlert\AttackAlert\obj\Debug\SoundTheAlarm.dll
+C:\Users\Jourdan Haines\Documents\Visual Studio 2015\Projects\AttackAlert\AttackAlert\obj\Debug\SoundTheAlarm.pdb
+C:\Users\Jourdan Haines\Documents\Visual Studio 2015\Projects\AttackAlert\AttackAlert\obj\Debug\SoundTheAlarm.csprojResolveAssemblyReference.cache
