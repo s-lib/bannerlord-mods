@@ -32,7 +32,7 @@ namespace ViewAllWars
                                 if (warCount > 0)
                                     message = message.Substring(0, message.Length - 5);
                                 else
-                                    message = message.Substring(0, message.Length - 8) + " is at peace.";
+                                    message = message.Substring(0, message.Length - 8) + " is at peace";
                                 message += "\n\n";
                             }
                         }
