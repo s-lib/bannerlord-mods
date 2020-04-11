@@ -184,7 +184,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Patches\HourlyTickPatch.cs" />
-    <Compile Include="SubModule.cs" />
+    <Compile Include="STAAction.cs" />
+    <Compile Include="STAConfiguration.cs" />
+    <Compile Include="STALibrary.cs" />
+    <Compile Include="StringExtensions.cs" />
+    <Compile Include="STAMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
