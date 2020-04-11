@@ -40,11 +40,16 @@ namespace SoundTheAlarm {
         //    }
         //}
 
+        // Check if the alert should fire (thanks to iPherian for submitting pull request that fixed alert not showing if you are not the king)
+        private bool ShouldAlertForSettlement(Settlement settlement) {
+            return settlement.MapFaction.Leader == Hero.MainHero || settlement.OwnerClan.Leader == Hero.MainHero;
+        }
+
         // Action method fired once the VilageBeingRaided event fires
         private void DisplayVillageRaid(Village v) {
             if(Hero.MainHero != null) {
                 if(Hero.MainHero.IsAlive) {
-                    if(v.Settlement.MapFaction.Leader == Hero.MainHero) {
+                    if(ShouldAlertForSettlement(v.Settlement)) {
                         if(!_managedSettlements.Contains(v.Settlement.Name.ToString())) {
                             _managedSettlements.Add(v.Settlement.Name.ToString());
                             string display =
@@ -76,7 +81,7 @@ namespace SoundTheAlarm {
         private void DisplaySiege(SiegeEvent e) {
             if (Hero.MainHero != null) {
                 if (Hero.MainHero.IsAlive) {
-                    if (e.BesiegedSettlement.MapFaction.Leader == Hero.MainHero) {
+                    if (ShouldAlertForSettlement(e.BesiegedSettlement)) {
                         if (!_managedSettlements.Contains(e.BesiegedSettlement.Name.ToString())) {
                             _managedSettlements.Add(e.BesiegedSettlement.Name.ToString());
                             string display =
