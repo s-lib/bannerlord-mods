@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
-using HarmonyLib;
 
 namespace SoundTheAlarm {
     public class STAMain : MBSubModuleBase {
@@ -22,10 +20,14 @@ namespace SoundTheAlarm {
             base.OnBeforeInitialModuleScreenSetAsRoot();
             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                 InformationManager.DisplayMessage(new InformationMessage(
-                    "STALibrary: " +
-                    "Fiefs(" + STALibrary.Instance.STAConfiguration.EnableFiefPopup + ") " +
-                    "Wars(" + STALibrary.Instance.STAConfiguration.EnableWarPopup + ") " +
-                    "Peace(" + STALibrary.Instance.STAConfiguration.EnablePeacePopup + ")",
+                    "STALibrary:\n" +
+                    "Villages(" + STALibrary.Instance.STAConfiguration.EnableVillagePopup + ")\n" +
+                    "Castles(" + STALibrary.Instance.STAConfiguration.EnableCastlePopup + ")\n" +
+                    "Towns(" + STALibrary.Instance.STAConfiguration.EnableTownPopup + ")\n" +
+                    "Wars(" + STALibrary.Instance.STAConfiguration.EnableWarPopup + ")\n" +
+                    "Peace(" + STALibrary.Instance.STAConfiguration.EnablePeacePopup + ")\n" +
+                    "PauseOnPopup(" + STALibrary.Instance.STAConfiguration.PauseGameOnPopup + ")\n" +
+                    "TimeToRemove(" + STALibrary.Instance.STAConfiguration.TimeToRemoveVillageFromList + ")\n",
                     new Color(1.0f, 0.0f, 0.0f)));
         }
 
@@ -34,9 +36,11 @@ namespace SoundTheAlarm {
             base.OnGameLoaded(game, initializerObject);
             try {
                 STALibrary.Instance.STAAction.Initialize();
-                if(STALibrary.Instance.STAConfiguration.EnableFiefPopup) {
+                if(STALibrary.Instance.STAConfiguration.EnableVillagePopup) {
                     CampaignEvents.VillageBeingRaided.AddNonSerializedListener(this, new Action<Village>(STALibrary.Instance.STAAction.DisplayVillageRaid));
                     CampaignEvents.VillageBecomeNormal.AddNonSerializedListener(this, new Action<Village>(STALibrary.Instance.STAAction.FinalizeVillageRaid));
+                }
+                if (STALibrary.Instance.STAConfiguration.EnableCastlePopup || STALibrary.Instance.STAConfiguration.EnableTownPopup) {
                     CampaignEvents.OnSiegeEventStartedEvent.AddNonSerializedListener(this, new Action<SiegeEvent>(STALibrary.Instance.STAAction.DisplaySiege));
                     CampaignEvents.OnSiegeEventEndedEvent.AddNonSerializedListener(this, new Action<SiegeEvent>(STALibrary.Instance.STAAction.FinalizeSiege));
                 }
@@ -50,20 +54,5 @@ namespace SoundTheAlarm {
                 MessageBox.Show("An error has occurred whilst initialising Sound The Alarm:\n\n" + ex.Message + "\n\n" + ex.StackTrace);
             }
         }
-        
-        // Below is the alternate method using the Harmony library to patch the relative methods
-        //protected override void OnSubModuleLoad() {
-        //    base.OnSubModuleLoad();
-        //    try {
-        //        HourlyTickPatch.Initialize();
-
-        //        Harmony harmony = new Harmony("mod.bannerlord.alpine");
-        //        harmony.PatchAll();
-
-        //    } catch(Exception ex) {
-        //        MessageBox.Show("An error has occurred whilst initialising Sound The Alarm:\n\n" + ex.Message + "\n\n" + ex.StackTrace);
-        //    }
-        //}
-
     }
 }

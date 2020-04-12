@@ -25,14 +25,26 @@ namespace SoundTheAlarm {
                 string text = node.Name.Trim().ToLower();
                 if(!string.IsNullOrWhiteSpace(text)) {
                     switch (text) {
-                        case "enablefiefpopup":
-                            STAConfiguration.EnableFiefPopup = node.InnerText.ToBool();
+                        case "enablevillagepopup":
+                            STAConfiguration.EnableVillagePopup = node.InnerText.ToBool();
+                            break;
+                        case "enablecastlepopup":
+                            STAConfiguration.EnableCastlePopup = node.InnerText.ToBool();
+                            break;
+                        case "enabletownpopup":
+                            STAConfiguration.EnableTownPopup = node.InnerText.ToBool();
                             break;
                         case "enablewarpopup":
                             STAConfiguration.EnableWarPopup = node.InnerText.ToBool();
                             break;
                         case "enablepeacepopup":
                             STAConfiguration.EnablePeacePopup = node.InnerText.ToBool();
+                            break;
+                        case "pausegameonpopup":
+                            STAConfiguration.PauseGameOnPopup = node.InnerText.ToBool();
+                            break;
+                        case "timetoremovevillagefromlist":
+                            STAConfiguration.TimeToRemoveVillageFromList = float.Parse(node.InnerText);
                             break;
                         case "enabledebugmessages":
                             STAConfiguration.EnableDebugMessages = node.InnerText.ToBool();

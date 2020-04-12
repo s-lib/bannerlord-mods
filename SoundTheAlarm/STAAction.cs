@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Collections.Generic;
 using TaleWorlds.Core;
-using TaleWorlds.MountAndBlade;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 
 namespace SoundTheAlarm {
     public class STAAction {
 
-        private static STAAction _instance;
-
-        private List<string> managedSettlements;
+        private Dictionary<string, float> managedSettlements;
         private Settlement settlementToTrack;
 
         public void Initialize() {
-            managedSettlements = new List<string>();
+            managedSettlements = new Dictionary<string, float>();
         }
 
         // Action method fired once the VilageBeingRaided event fires
@@ -23,9 +19,10 @@ namespace SoundTheAlarm {
             if (Hero.MainHero != null) {
                 if (Hero.MainHero.IsAlive) {
                     if (ShouldAlertForSettlement(v.Settlement)) {
-                        if (!managedSettlements.Contains(v.Settlement.Name.ToString())) {
-                            managedSettlements.Add(v.Settlement.Name.ToString());
+                        if (!managedSettlements.ContainsKey(v.Settlement.Name.ToString())) {
+                            managedSettlements.Add(v.Settlement.Name.ToString(), Campaign.CurrentTime);
                             string display =
+                                "The village of " + 
                                 v.Settlement.Name.ToString() +
                                 " is under attack by " +
                                 v.Settlement.LastAttackerParty.Name.ToString() +
@@ -35,7 +32,7 @@ namespace SoundTheAlarm {
                             ;
 
                             settlementToTrack = v.Settlement;
-                            InformationManager.ShowInquiry(new InquiryData("Sound The Alarm", display, true, true, "Track", "Close", new Action(Track), null, ""), true);
+                            InformationManager.ShowInquiry(new InquiryData("Village Being Raided", display, true, true, "Track", "Close", new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
                             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
                         }
@@ -46,10 +43,19 @@ namespace SoundTheAlarm {
 
         // Action method fired once the VillageBecomeNormal event fires
         public void FinalizeVillageRaid(Village v) {
-            if (managedSettlements.Contains(v.Settlement.Name.ToString())) {
-                managedSettlements.Remove(v.Settlement.Name.ToString());
+            if (managedSettlements.ContainsKey(v.Settlement.Name.ToString())) {
+                float time;
+                if(!managedSettlements.TryGetValue(v.Settlement.Name.ToString(), out time)) {
+                    return;
+                }
+                if(Campaign.CurrentTime > time + STALibrary.Instance.STAConfiguration.TimeToRemoveVillageFromList) {
+                    managedSettlements.Remove(v.Settlement.Name.ToString());
+                    if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
+                        InformationManager.DisplayMessage(new InformationMessage("STALibrary: Removed " + v.Settlement.Name.ToString() + " from managed settlements list", new Color(1.0f, 0.0f, 0.0f)));
+                }
+
                 if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
-                    InformationManager.DisplayMessage(new InformationMessage("STALibrary: Removed " + v.Settlement.Name.ToString() + " from managed settlements list", new Color(1.0f, 0.0f, 0.0f)));
+                    InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + v.Settlement.Name.ToString() + " count is at " + ((time + STALibrary.Instance.STAConfiguration.TimeToRemoveVillageFromList) - Campaign.CurrentTime), new Color(1.0f, 0.0f, 0.0f)));
             }
         }
 
@@ -58,9 +64,27 @@ namespace SoundTheAlarm {
             if (Hero.MainHero != null) {
                 if (Hero.MainHero.IsAlive) {
                     if (ShouldAlertForSettlement(e.BesiegedSettlement)) {
-                        if (!managedSettlements.Contains(e.BesiegedSettlement.Name.ToString())) {
-                            managedSettlements.Add(e.BesiegedSettlement.Name.ToString());
+                        if(e.BesiegedSettlement.IsCastle && STALibrary.Instance.STAConfiguration.EnableCastlePopup) {
+                            if (!managedSettlements.ContainsKey(e.BesiegedSettlement.Name.ToString())) {
+                                managedSettlements.Add(e.BesiegedSettlement.Name.ToString(), 0.0f);
+                                string display =
+                                    "The castle of " + 
+                                    e.BesiegedSettlement.Name.ToString() +
+                                    " is under attack by " +
+                                    e.BesiegedSettlement.LastAttackerParty.Name.ToString() +
+                                    " of the " +
+                                    e.BesiegedSettlement.LastAttackerParty.LeaderHero.MapFaction.Name.ToString() +
+                                    "!"
+                                ;
+                                settlementToTrack = e.BesiegedSettlement;
+                                InformationManager.ShowInquiry(new InquiryData("Castle Under Siege", display, true, true, "Track", "Close", new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
+                                if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
+                                    InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
+                            }
+                        } else if(e.BesiegedSettlement.IsTown && STALibrary.Instance.STAConfiguration.EnableTownPopup) {
+                            managedSettlements.Add(e.BesiegedSettlement.Name.ToString(), 0.0f);
                             string display =
+                                "The town of " + 
                                 e.BesiegedSettlement.Name.ToString() +
                                 " is under attack by " +
                                 e.BesiegedSettlement.LastAttackerParty.Name.ToString() +
@@ -69,7 +93,7 @@ namespace SoundTheAlarm {
                                 "!"
                             ;
                             settlementToTrack = e.BesiegedSettlement;
-                            InformationManager.ShowInquiry(new InquiryData("Sound The Alarm", display, true, true, "Track", "Close", new Action(Track), null, ""), true);
+                            InformationManager.ShowInquiry(new InquiryData("Town Under Siege", display, true, true, "Track", "Close", new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
                             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
                         }
@@ -80,7 +104,7 @@ namespace SoundTheAlarm {
 
         // Action method fired once the OnSiegeEventEndedEvent event fires
         public void FinalizeSiege(SiegeEvent e) {
-            if (managedSettlements.Contains(e.BesiegedSettlement.Name.ToString())) {
+            if (managedSettlements.ContainsKey(e.BesiegedSettlement.Name.ToString())) {
                 managedSettlements.Remove(e.BesiegedSettlement.Name.ToString());
                 if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                     InformationManager.DisplayMessage(new InformationMessage("STALibrary: Removed " + e.BesiegedSettlement.Name.ToString() + " from managed settlements list", new Color(1.0f, 0.0f, 0.0f)));
@@ -96,7 +120,7 @@ namespace SoundTheAlarm {
                 " has signed a declaration of war against the " +
                 faction2.Name.ToString();
             ;
-            InformationManager.ShowInquiry(new InquiryData("Sound The Alarm", display, true, false, "Ok", "Close", null, null, ""), false);
+            InformationManager.ShowInquiry(new InquiryData("Declaration of War", display, true, false, "Ok", "Close", null, null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
         }
@@ -110,7 +134,7 @@ namespace SoundTheAlarm {
                 " has signed a declaration of peace with the " +
                 faction2.Name.ToString();
             ;
-            InformationManager.ShowInquiry(new InquiryData("Sound The Alarm", display, true, false, "Ok", "Close", null, null, ""), false);
+            InformationManager.ShowInquiry(new InquiryData("Declaration of Peace", display, true, false, "Ok", "Close", null, null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
         }
@@ -126,16 +150,5 @@ namespace SoundTheAlarm {
         private bool ShouldAlertForSettlement(Settlement settlement) {
             return settlement.MapFaction.Leader == Hero.MainHero || settlement.OwnerClan.Leader == Hero.MainHero;
         }
-
-        // Returns the instance of this class, if no instance exists, creates a new instance
-        public static STAAction Instance {
-            get {
-                if(STAAction._instance == null) {
-                    STAAction._instance = new STAAction();
-                }
-                return STAAction._instance;
-            }
-        }
-
     }
 }
