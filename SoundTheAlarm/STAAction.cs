@@ -16,6 +16,7 @@ namespace SoundTheAlarm {
 
         // Action method fired once the VilageBeingRaided event fires
         public void DisplayVillageRaid(Village v) {
+            RemoveExpiredFromManagedSettlements(v.Settlement);
             if (Hero.MainHero != null) {
                 if (Hero.MainHero.IsAlive) {
                     if (ShouldAlertForSettlement(v.Settlement)) {
@@ -43,20 +44,7 @@ namespace SoundTheAlarm {
 
         // Action method fired once the VillageBecomeNormal event fires
         public void FinalizeVillageRaid(Village v) {
-            if (managedSettlements.ContainsKey(v.Settlement.Name.ToString())) {
-                float time;
-                if(!managedSettlements.TryGetValue(v.Settlement.Name.ToString(), out time)) {
-                    return;
-                }
-                if(Campaign.CurrentTime > time + STALibrary.Instance.STAConfiguration.TimeToRemoveVillageFromList) {
-                    managedSettlements.Remove(v.Settlement.Name.ToString());
-                    if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
-                        InformationManager.DisplayMessage(new InformationMessage("STALibrary: Removed " + v.Settlement.Name.ToString() + " from managed settlements list", new Color(1.0f, 0.0f, 0.0f)));
-                }
-
-                if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
-                    InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + v.Settlement.Name.ToString() + " count is at " + ((time + STALibrary.Instance.STAConfiguration.TimeToRemoveVillageFromList) - Campaign.CurrentTime), new Color(1.0f, 0.0f, 0.0f)));
-            }
+            RemoveExpiredFromManagedSettlements(v.Settlement);
         }
 
         // Action method fired once the OnSiegeEventStartedEvent event fires
@@ -149,6 +137,24 @@ namespace SoundTheAlarm {
         // Check if the alert should fire (thanks to iPherian for submitting pull request that fixed alert not showing if you are not the king)
         private bool ShouldAlertForSettlement(Settlement settlement) {
             return settlement.MapFaction.Leader == Hero.MainHero || settlement.OwnerClan.Leader == Hero.MainHero;
+        }
+
+        // We ignore certain settlements when alerting for a period of time after user first alerted. This removes a settlement which has expired in that way from the list.
+        private void RemoveExpiredFromManagedSettlements(Settlement settlement) {
+            if (managedSettlements.ContainsKey(settlement.Name.ToString())) {
+                float time;
+                if (!managedSettlements.TryGetValue(settlement.Name.ToString(), out time)) {
+                    return;
+                }
+                if (Campaign.CurrentTime > time + STALibrary.Instance.STAConfiguration.TimeToRemoveVillageFromList) {
+                    managedSettlements.Remove(settlement.Name.ToString());
+                    if (STALibrary.Instance.STAConfiguration.EnableDebugMessages) 
+                        InformationManager.DisplayMessage(new InformationMessage("STALibrary: Removed " + settlement.Name.ToString() + " from managed settlements list", new Color(1.0f, 0.0f, 0.0f)));
+                }
+        
+                if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
+                    InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + settlement.Name.ToString() + " count is at " + ((time + STALibrary.Instance.STAConfiguration.TimeToRemoveVillageFromList) - Campaign.CurrentTime), new Color(1.0f, 0.0f, 0.0f)));
+            }
         }
     }
 }
