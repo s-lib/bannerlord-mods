@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
+using TaleWorlds.Localization;
 
 namespace SoundTheAlarm {
     public class STAAction {
@@ -22,18 +23,27 @@ namespace SoundTheAlarm {
                     if (ShouldAlertForSettlement(v.Settlement)) {
                         if (!managedSettlements.ContainsKey(v.Settlement.Name.ToString())) {
                             managedSettlements.Add(v.Settlement.Name.ToString(), Campaign.CurrentTime);
-                            string display =
-                                "The village of " + 
-                                v.Settlement.Name.ToString() +
-                                " is under attack by " +
-                                v.Settlement.LastAttackerParty.Name.ToString() +
-                                " of the " +
-                                v.Settlement.LastAttackerParty.LeaderHero.MapFaction.Name.ToString() +
-                                "!"
-                            ;
+
+                            TextObject text = GameTexts.FindText("str_sta_alarm_village_attack_message", null);
+                            text.SetTextVariable("VILLAGE", v.Settlement.Name.ToString());
+                            TextObject attacker = new TextObject("", null);
+                            attacker.SetTextVariable("PARTY", v.Settlement.LastAttackerParty.Name);
+                            attacker.SetTextVariable("NAME", v.Settlement.LastAttackerParty.LeaderHero.Name);
+                            attacker.SetTextVariable("GENDER", v.Settlement.LastAttackerParty.LeaderHero.IsFemale ? 1 : 0);
+                            attacker.SetTextVariable("FACTION", v.Settlement.LastAttackerParty.LeaderHero.MapFaction.Name);
+                            text.SetTextVariable("ATTACKER", attacker); 
+
+                            TextObject header = GameTexts.FindText("str_sta_alarm_village_attack_title", null);
+                            header.SetTextVariable("ICON", "{=!}<img src=\"Icons\\Food@2x\">");
+
+                            string title = header.ToString();
+                            string display = text.ToString();
+                            string track = GameTexts.FindText("str_sta_ui_track", null).ToString();
+                            string close = GameTexts.FindText("str_sta_ui_close", null).ToString();
+                                                        
 
                             settlementToTrack = v.Settlement;
-                            InformationManager.ShowInquiry(new InquiryData("Village Being Raided", display, true, true, "Track", "Close", new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
+                            InformationManager.ShowInquiry(new InquiryData(title, display, true, true, track, close, new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
                             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
                         }
@@ -55,33 +65,51 @@ namespace SoundTheAlarm {
                         if(e.BesiegedSettlement.IsCastle && STALibrary.Instance.STAConfiguration.EnableCastlePopup) {
                             if (!managedSettlements.ContainsKey(e.BesiegedSettlement.Name.ToString())) {
                                 managedSettlements.Add(e.BesiegedSettlement.Name.ToString(), 0.0f);
-                                string display =
-                                    "The castle of " + 
-                                    e.BesiegedSettlement.Name.ToString() +
-                                    " is under attack by " +
-                                    e.BesiegedSettlement.LastAttackerParty.Name.ToString() +
-                                    " of the " +
-                                    e.BesiegedSettlement.LastAttackerParty.LeaderHero.MapFaction.Name.ToString() +
-                                    "!"
-                                ;
+
+                                TextObject text = GameTexts.FindText("str_sta_alarm_castle_attack_message", null);
+                                text.SetTextVariable("CASTLE", e.BesiegedSettlement.Name.ToString());
+                                TextObject attacker = new TextObject("", null);
+                                attacker.SetTextVariable("PARTY", e.BesiegedSettlement.LastAttackerParty.Name);
+                                attacker.SetTextVariable("NAME", e.BesiegedSettlement.LastAttackerParty.LeaderHero.Name);
+                                attacker.SetTextVariable("GENDER", e.BesiegedSettlement.LastAttackerParty.LeaderHero.IsFemale ? 1 : 0);
+                                attacker.SetTextVariable("FACTION", e.BesiegedSettlement.LastAttackerParty.LeaderHero.MapFaction.Name);
+                                text.SetTextVariable("ATTACKER", attacker);
+
+                                TextObject header = GameTexts.FindText("str_sta_alarm_castle_attack_title", null);
+                                header.SetTextVariable("ICON", "{=!}<img src=\"MapOverlay\\Settlement\\icon_wall\">"); 
+
+                                string title = header.ToString();
+                                string display = text.ToString();
+                                string track = GameTexts.FindText("str_sta_ui_track", null).ToString();
+                                string close = GameTexts.FindText("str_sta_ui_close", null).ToString();
+
                                 settlementToTrack = e.BesiegedSettlement;
-                                InformationManager.ShowInquiry(new InquiryData("Castle Under Siege", display, true, true, "Track", "Close", new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
+                                InformationManager.ShowInquiry(new InquiryData(title, display, true, true, track, close, new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
                                 if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                                     InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
                             }
                         } else if(e.BesiegedSettlement.IsTown && STALibrary.Instance.STAConfiguration.EnableTownPopup) {
                             managedSettlements.Add(e.BesiegedSettlement.Name.ToString(), 0.0f);
-                            string display =
-                                "The town of " + 
-                                e.BesiegedSettlement.Name.ToString() +
-                                " is under attack by " +
-                                e.BesiegedSettlement.LastAttackerParty.Name.ToString() +
-                                " of the " +
-                                e.BesiegedSettlement.LastAttackerParty.LeaderHero.MapFaction.Name.ToString() +
-                                "!"
-                            ;
+
+                            TextObject text = GameTexts.FindText("str_sta_alarm_town_attack_message", null);
+                            text.SetTextVariable("TOWN", e.BesiegedSettlement.Name.ToString());
+                            TextObject attacker = new TextObject("", null);
+                            attacker.SetTextVariable("PARTY", e.BesiegedSettlement.LastAttackerParty.Name);
+                            attacker.SetTextVariable("NAME", e.BesiegedSettlement.LastAttackerParty.LeaderHero.Name);
+                            attacker.SetTextVariable("GENDER", e.BesiegedSettlement.LastAttackerParty.LeaderHero.IsFemale ? 1 : 0);
+                            attacker.SetTextVariable("FACTION", e.BesiegedSettlement.LastAttackerParty.LeaderHero.MapFaction.Name);
+                            text.SetTextVariable("ATTACKER", attacker);
+
+                            TextObject header = GameTexts.FindText("str_sta_alarm_town_attack_title", null);
+                            header.SetTextVariable("ICON", "{=!}<img src=\"MapOverlay\\Settlement\\icon_walls_lvl1\">");
+
+                            string title = header.ToString();
+                            string display = text.ToString();
+                            string track = GameTexts.FindText("str_sta_ui_track", null).ToString();
+                            string close = GameTexts.FindText("str_sta_ui_close", null).ToString();
+
                             settlementToTrack = e.BesiegedSettlement;
-                            InformationManager.ShowInquiry(new InquiryData("Town Under Siege", display, true, true, "Track", "Close", new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
+                            InformationManager.ShowInquiry(new InquiryData(title, display, true, true, track, close, new Action(Track), null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
                             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
                         }
@@ -101,28 +129,44 @@ namespace SoundTheAlarm {
 
         // Action method fired once two empires declare war
         public void OnDeclareWar(IFaction faction1, IFaction faction2) {
-            string display =
-                faction1.Leader.Name.ToString() +
-                " of the " +
-                faction1.Name.ToString() +
-                " has signed a declaration of war against the " +
-                faction2.Name.ToString();
-            ;
-            InformationManager.ShowInquiry(new InquiryData("Declaration of War", display, true, false, "Ok", "Close", null, null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
+
+            TextObject text = GameTexts.FindText("str_sta_alarm_war_message", null);
+            text.SetTextVariable("LEADER", faction1.Leader.Name);
+            text.SetTextVariable("IS_FEMALE", faction1.Leader.IsFemale ? 1 : 0);
+            text.SetTextVariable("FACTION1", faction1.Name.ToString());
+            text.SetTextVariable("FACTION2", faction2.Name.ToString());
+
+            TextObject header = GameTexts.FindText("str_sta_alarm_war_title", null);
+            header.SetTextVariable("ICON", "{=!}<img src=\"Icons\\Party@2x\">");
+
+            string title = header.ToString();
+            string display = text.ToString();
+            string ok = GameTexts.FindText("str_sta_ui_ok", null).ToString();
+            string close = GameTexts.FindText("str_sta_ui_close", null).ToString();
+
+            InformationManager.ShowInquiry(new InquiryData(title, display, true, false, ok, close, null, null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
         }
 
         // Action method fired once two empires declare peace
         public void OnDeclarePeace(IFaction faction1, IFaction faction2) {
-            string display =
-                faction1.Leader.Name.ToString() +
-                " of the " +
-                faction1.Name.ToString() +
-                " has signed a declaration of peace with the " +
-                faction2.Name.ToString();
-            ;
-            InformationManager.ShowInquiry(new InquiryData("Declaration of Peace", display, true, false, "Ok", "Close", null, null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
+
+            TextObject text = GameTexts.FindText("str_sta_alarm_peace_message", null);
+            text.SetTextVariable("LEADER", faction1.Leader.Name.ToString());
+            text.SetTextVariable("IS_FEMALE", faction1.Leader.IsFemale ? 1 : 0);
+            text.SetTextVariable("FACTION1", faction1.Name.ToString());
+            text.SetTextVariable("FACTION2", faction2.Name.ToString());
+
+            TextObject header = GameTexts.FindText("str_sta_alarm_peace_title", null);
+            header.SetTextVariable("ICON", "{=!}<img src=\"Icons\\Morale@2x\">");
+
+            string title = header.ToString();
+            string display = text.ToString();
+            string ok = GameTexts.FindText("str_sta_ui_ok", null).ToString();
+            string close = GameTexts.FindText("str_sta_ui_close", null).ToString();
+
+            InformationManager.ShowInquiry(new InquiryData(title, display, true, false, ok, close, null, null, ""), STALibrary.Instance.STAConfiguration.PauseGameOnPopup);
             if (STALibrary.Instance.STAConfiguration.EnableDebugMessages)
                 InformationManager.DisplayMessage(new InformationMessage("STALibrary: " + display, new Color(1.0f, 0.0f, 0.0f)));
         }

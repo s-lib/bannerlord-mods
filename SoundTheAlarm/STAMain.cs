@@ -50,6 +50,7 @@ namespace SoundTheAlarm {
                 if (STALibrary.Instance.STAConfiguration.EnablePeacePopup) {
                     CampaignEvents.MakePeace.AddNonSerializedListener(this, new Action<IFaction, IFaction>(STALibrary.Instance.STAAction.OnDeclarePeace));
                 }
+                game.GameTextManager.LoadGameTexts(BasePath.Name + $"Modules/SoundTheAlarm/ModuleData/module_strings.xml");
             } catch (Exception ex) {
                 MessageBox.Show("An error has occurred whilst initialising Sound The Alarm:\n\n" + ex.Message + "\n\n" + ex.StackTrace);
             }
